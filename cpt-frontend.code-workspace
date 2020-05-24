@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.autoSave": "afterDelay",
+		"editor.wordWrap": "on",
+		"files.exclude": {
+			"**.code-workspace": true
+		}
+	}
+}
