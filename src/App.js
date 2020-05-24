@@ -5,7 +5,8 @@ import {Container, Row, Col, Navbar, Nav, Jumbotron, Button, Table, Form, FormCo
 import { PageComponent} from './components/pagination';
 import axios from 'axios';
 
-
+const FETCH_CPT = 'https://cpt-backend-nodejs.herokuapp.com/cpt/recruiters';
+const FETCH_SEARCH_CPT = 'https://cpt-backend-nodejs.herokuapp.com/cpt/recruiters';
 function App() {
   let [isLoading, setLoadingState] = useState(true);
   let [recruiters, setRecruiters] = useState({});
@@ -13,17 +14,10 @@ function App() {
   let [search, setSearch] = useState('');
 
   async function fetchRecruiters(){
-    // fetch("https://cpt-backend-nodejs.herokuapp.com/cpt/recruiters",{method: "GET", mode: 'no-cors',headers: {
-    //   'Access-Control-Allow-Origin':'*','content-type':'application/json'
-    // }}).then(response => response.json())
-    // .then(jsondata =>  {
-    //     console.log(jsondata);
-    //     setRecruiters(recruiters = jsondata.data); 
-    //     setLoadingState(isLoading = true);
-    //   })
-    //   .catch(err => setError(error = err.message));
+    
     try {
-      const response = await axios.get('https://cpt-backend-nodejs.herokuapp.com/cpt/recruiters',{ crossorigin: true });
+      const query = search.length > 0 ? '/'+search : '';
+      const response = await axios.get(FETCH_CPT+query,{ crossorigin: true });
       //console.log(response);
       if(response.status === 200 ){
         console.log(response.data);
@@ -34,19 +28,36 @@ function App() {
       console.error(error);
       setError(error = err.message)
     }
+  }
 
-    
+  function handleClick(e){
+    if(search.length > 2) {
+      setLoadingState(true);
+    }
+  }
 
+  function clearSearch(){
+    if(search.length > 2) {
+      setLoadingState(true);
+      fetchRecruiters();
+    }
+    if(search.length === 0 & !isLoading){
+      fetchRecruiters();
+    }
   }
 
   useEffect(() => {
-    if(isLoading === true){
+    console.log('useEffect called')
+    let ignore = false;
+    clearSearch();
+    if(isLoading && !ignore){
       fetchRecruiters();
     }
-  });
+    return () => { ignore = true; }
+  }, [search]);
   
   return (
-    <>
+    <div>
     <Navbar bg="dark" variant="dark">
       <Navbar.Brand href="#">
         <img
@@ -83,17 +94,19 @@ function App() {
         </Jumbotron>
         </Col>
      </Row>
-      {  !isLoading && <Container>
+     
       <Row className="justify-content-md-center">
         <Col sm={7}>
         <InputGroup className="mb-3">
         <FormControl
-          placeholder="search for recruiters "
+          placeholder="search for recruiters (min. : 3 chars)"
           aria-label="search for recruiters "
           aria-describedby="basic-addon2"
+          defaultValue={search} 
+          onChange={e => setSearch(e.target.value)} 
         />
         <InputGroup.Append>
-          <Button variant="secondary">Search</Button>
+          <Button variant="secondary" onClick={e => handleClick(e)}>Search</Button>
           </InputGroup.Append>
         </InputGroup>
           {/* <Form inline className="justify-content-end mb-sm-2">
@@ -105,6 +118,7 @@ function App() {
           <PageComponent active={0} total={0} />
         </Col> */}
       </Row>
+      {  !isLoading && <Container>
      <Row>
        <Col>
         <Table striped bordered hover responsive>
@@ -113,7 +127,7 @@ function App() {
                 <th>#</th>
                 <th>Recruiter</th>
                 <th>Contact</th>
-                <th></th>
+                
               </tr>
             </thead>
             <tbody>
@@ -123,7 +137,7 @@ function App() {
                 <td>{index+1}</td>
                 <td>{cpt.fname.toUpperCase()}</td>
                 <td><a href={cpt.fweb}>{cpt.fweb}</a></td>
-                <td></td>
+                
               </tr>
               ))
             }
@@ -139,7 +153,7 @@ function App() {
       }
 
     </Container>
-</>
+</div>
     
   );
 }
