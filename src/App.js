@@ -16,7 +16,7 @@ function App() {
     await fetch("https://cpt-backend-nodejs.herokuapp.com/cpt/recruiters",{method: "GET", mode: 'no-cors',headers: {
       'Access-Control-Allow-Origin':'*','content-type':'application/json'
     }})//.then(response => console.log(response.json()))
-    .then(jsondata => console.log(jsondata))
+    .then(jsondata => jsondata.json())
       .then(res => {
         console.log(res);
         setRecruiters(res); 
