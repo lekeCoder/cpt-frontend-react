@@ -8,34 +8,41 @@ import axios from 'axios';
 
 function App() {
   let [isLoading, setLoadingState] = useState(true);
-  const [recruiters, setRecruiters] = useState({});
+  let [recruiters, setRecruiters] = useState({});
   let [error, setError] = useState("");
   let [search, setSearch] = useState('');
 
   async function fetchRecruiters(){
-    await fetch("https://cpt-backend-nodejs.herokuapp.com/cpt/recruiters",{method: "GET", mode: 'no-cors',headers: {
-      'Access-Control-Allow-Origin':'*','content-type':'application/json'
-    }}).then(response => response.json())
-    .then(jsondata =>  {
-        console.log(jsondata);
-        setRecruiters(jsondata); 
-        setLoadingState(isLoading = true);
-      })
-      .catch(err => setError(error = err.message));
-    // try {
-    //   const response = await axios.get('https://cpt-backend-nodejs.herokuapp.com/cpt/recruiters',{ crossdomain: true });
-    //   console.log(response);
-    // } catch (err) {
-    //   console.error(error);
-    //   setError(error = err.message)
-    // }
+    // fetch("https://cpt-backend-nodejs.herokuapp.com/cpt/recruiters",{method: "GET", mode: 'no-cors',headers: {
+    //   'Access-Control-Allow-Origin':'*','content-type':'application/json'
+    // }}).then(response => response.json())
+    // .then(jsondata =>  {
+    //     console.log(jsondata);
+    //     setRecruiters(recruiters = jsondata.data); 
+    //     setLoadingState(isLoading = true);
+    //   })
+    //   .catch(err => setError(error = err.message));
+    try {
+      const response = await axios.get('https://cpt-backend-nodejs.herokuapp.com/cpt/recruiters',{ crossorigin: true });
+      //console.log(response);
+      if(response.status === 200 ){
+        console.log(response.data);
+        setRecruiters(recruiters = response.data); 
+        setLoadingState(isLoading = false);
+      }
+    } catch (err) {
+      console.error(error);
+      setError(error = err.message)
+    }
 
     
 
   }
 
   useEffect(() => {
-    fetchRecruiters();
+    if(isLoading === true){
+      fetchRecruiters();
+    }
   });
   
   return (
@@ -68,7 +75,7 @@ function App() {
           <p>
             I created this page to collect in one place all the firms in the US that employs students under the <b>Curriculum Practical Training (CPT)</b> F-1 Visa. Obviously, this is not exhaustive and the list is subject to change from time to time.  
           </p>
-          <p>If you know any firm or a recruiting firm that is not on this list, you can be of help to ther community of foreign students on CPT by adding a new recruiter. </p>
+          <p>If you know any firm or a recruiting firm that is not on this list, you can be of help to the community of local & foreign students on CPT by adding a new recruiter. </p>
           <p>
             <Button variant="dark">Add CPT Recruiter</Button>
           </p>
@@ -110,12 +117,17 @@ function App() {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>1</td>
-                <td>Mark</td>
-                <td>Otto</td>
-                <td>@mdo</td>
+            {
+              recruiters.data.map((cpt, index) => (
+                <tr key={index}>
+                <td>{index+1}</td>
+                <td>{cpt.fname.toUpperCase()}</td>
+                <td><a href={cpt.fweb}>{cpt.fweb}</a></td>
+                <td></td>
               </tr>
+              ))
+            }
+              
               </tbody>
         </Table>
        </Col>
